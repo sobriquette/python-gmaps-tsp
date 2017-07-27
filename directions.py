@@ -68,7 +68,7 @@ if __name__ == "__main__":
 	optimize_waypoints = 'optimize:true'
 	waypoints = [optimize_waypoints,'New York City', 'Washington D.C.']
 	config = {'origin': 'Boston', 'destination': 'Myrtle Beach', 
-			  'api_key': api_key,
+			  'api_key': os.environ['Directions_APIKEY'],
 			  'waypoints': generateWaypointsString(waypoints)}
 
 	# make request to GMaps Directions API

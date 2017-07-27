@@ -1,88 +1,66 @@
-import requests, os
-import pandas as pd
-import numpy as np
-from scipy.spatial import distance_matrix
+import re
+from TSPResult import TSPResult as tsp
+from DMRequest import DMRequest as dmr
 
-# make a request to the Gmaps Distance Matrix API
-def request_matrix(base_url, config):
-	response = requests.get(base_url, params=config).json()
-	return response
+def get_tour(num_points, msg, places):
+	num_points2 = num_points
+	start_str = '%d %d' % (num_points, num_points2)
 
-def get_response_data(response):
-	data = {'distance': [], 'duration': []}
-	
-	for r in response['rows']:
-		distances = []
-		durations = []
-		for e in r['elements']:
-			distances.append(e['distance']['value'])
-			durations.append(e['duration']['value'])
-		data['distance'].append(distances)
-		data['duration'].append(durations)
+	# Search the Concorde log for the start of city numbers
+	# Get the index where the numbers are first listed
+	start = msg.find(start_str)
+	legs = msg[( start + len(start_str + 1) ):]
+	indices = re.findall(r'(\d+) \d+ \d+', legs)
+	tour = map(lambda x: places['destinations'][int(x)], indices)
+	tour.append(tour[0])
 
-	return data
+	print(tour)
+	return tour
 
-def build_distance_matrix(data, places):
-	distances = data['distance']
-	durations = data['duration']
+def create_routes(tour):
+	routes = []
+	length = len(tour)
+	i = 1
 
-	df = pd.DataFrame(distances, columns=places, index=places)
-	dm = pd.DataFrame(distance_matrix(df.values, df.values), index=df.index, columns=df.index)
-	return dm
+	while length >= 2:
+		rlength = min( 8, length - 2 )
+		start = tour[0]
+		end = tour[rlength + 1]
+		route = tour[ 1 : rlength + 1 ]
+		routes.append( (i, start, end, route) )
+		i += 1
+		tour = tour[rlength + 1:]
+		length = len(tour)
 
-def build_lower_triangle_matrix(data):
-	lt = np.tril(data['distance'])
-	return lt
+	print(routes)
+	return routes
 
 if __name__ == "__main__":
-	base_url = 'https://maps.googleapis.com/maps/api/distancematrix/json'
-	api_key = api_key
-	origins = ["Arcadia, CA 91007", "Movie Flat Rd, Lone Pine, CA 93545", "Manzanar Reward Rd, California", "Devils Postpile Access Road, Mammoth Lakes, CA 93546", "Mono Lake, CA"]
-	destinations = ["Arcadia, CA 91007", "Movie Flat Rd, Lone Pine, CA 93545", "Manzanar Reward Rd, California", "Devils Postpile Access Road, Mammoth Lakes, CA 93546", "Mono Lake, CA"]
-	config = {
-		'origins': '|'.join(origins),
-		'destinations': '|'.join(destinations),
-		'key': api_key,
+	# List of places to include on the tour
+	places = {
+		'origins': ["Arcadia, CA 91007", "Movie Flat Rd, Lone Pine, CA 93545", "Manzanar Reward Rd, California", "Devils Postpile Access Road, Mammoth Lakes, CA 93546", "Mono Lake, CA"],
+		'destinations': ["Arcadia, CA 91007", "Movie Flat Rd, Lone Pine, CA 93545", "Manzanar Reward Rd, California", "Devils Postpile Access Road, Mammoth Lakes, CA 93546", "Mono Lake, CA"]
 	}
+	
+	# Create a Distance Matrix Request object
+	# --> get_matrix() will make a GET request to the Google DM API 
+	# --> get_response_data() will store the response values into a dictionary
+	# --> build_lower_triangle_matrix() generates a matrix in TSPLib format for NEOS
+	# distances_lt variable will be used for NEOS computation of an optimal tour
+	#dm = dmr(places)
+	#dm.data = dm.get_response_data(dm.get_matrix())
+	#distances_lt = dm.build_lower_triangle_matrix(dm.data)
 
-	response = request_matrix(base_url, config)
-	data = get_response_data(response)
-	#build_distance_matrix(data, origins)
-	distances_lt = build_lower_triangle_matrix(data)
-	tsp_template = """
-		TYPE : TSP
-		DIMENSION: %i
-		EDGE_WEIGHT_TYPE : EXPLICIT
-		EDGE_WEIGHT_FORMAT : LOWER_DIAG_ROW
-		EDGE_WEIGHT_SECTION
-		%s
-		EOF
-	"""
-
-	tsp_data = tsp_template % (5, distances_lt)
-
-	base_xml = """
-		<document>
-		<category>co</category>
-		<solver>concorde</solver>
-		<inputType>TSP</inputType>
-		<priority>long</priority>
-		<email>my-email</email>
-		<dat2><![CDATA[]]></dat2>
-
-		<dat1><![CDATA[]]></dat1>
-
-		<tsp><![CDATA[%s]]></tsp>
-
-		<ALGTYPE><![CDATA[con]]></ALGTYPE>
-
-		<RDTYPE><![CDATA[fixed]]></RDTYPE>
-
-		<PLTYPE><![CDATA[no]]></PLTYPE>
-
-		<comment><![CDATA[]]></comment>
-
-		</document>
-	"""
-
-	tsp_xml = base_xml % tsp_data
+	distances_lt = [[     0,      0,      0,      0,      0],
+					[357938,      0,      0,      0,      0],
+					[366042,  23361,      0,      0,      0],
+					[531201, 188520, 165286,      0,      0],
+					[547170, 204489, 181254,  60864,      0]]
+	# Create a TSP Result object to handle requests to NEOS server
+	# --> Build an XML using the distances_lt data
+	# --> Submit a job to the NEOS server
+	# --> Parse result log for tour
+	tsp_xml = tsp.get_xml_with_data( len(places['origins']), distances_lt )
+	result = tsp().run_tsp_job(tsp_xml)
+	tour = get_tour( len(places['destinations']), result, places )
+	routes = create_routes(tour)
