@@ -51,6 +51,7 @@ if __name__ == "__main__":
 	#dm.data = dm.get_response_data(dm.get_matrix())
 	#distances_lt = dm.build_lower_triangle_matrix(dm.data)
 
+	# temp data so we do not have to keep making requests to Google's API
 	distances_lt = [[     0,      0,      0,      0,      0],
 					[357938,      0,      0,      0,      0],
 					[366042,  23361,      0,      0,      0],
@@ -62,5 +63,5 @@ if __name__ == "__main__":
 	# --> Parse result log for tour
 	tsp_xml = tsp.get_xml_with_data( len(places['origins']), distances_lt )
 	result = tsp().run_tsp_job(tsp_xml)
-	tour = get_tour( len(places['destinations']), result, places )
+	tour = get_tour( len(places['destinations']), solution, places )
 	routes = create_routes(tour)

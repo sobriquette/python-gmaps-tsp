@@ -98,14 +98,6 @@ class TSPResult(object):
 				sys.stderr.write( "NEOS error: %s" % password )
 				sys.exit(1)
 			else:
-				# status = "Waiting"
-
-				# while status == "Running" or status == "Waiting":
-				# 	print(status)
-				# 	time.sleep(1)
-				# 	status = self.neos.getJobStatus( jobNumber, password )
-				
-				# Print out partial job output while job is running
 				offset = 0
 				status = ""
 				while status != "Done":
