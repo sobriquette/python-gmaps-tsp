@@ -1,7 +1,7 @@
 #################################################################################################
 ## Source: https://www.ibm.com/developerworks/community/blogs/jfp/resource/tsp_nb.html?lang=en ##
 #################################################################################################
-import os, sys, time
+import os, sys, time, re
 from xmlrpc import client
 
 class TSPResult(object):
@@ -18,13 +18,13 @@ class TSPResult(object):
 	@staticmethod
 	def create_tsp_template(n_points, data):
 		tsp_template = """
-			TYPE : TSP
-			DIMENSION: %i
-			EDGE_WEIGHT_TYPE : EXPLICIT
-			EDGE_WEIGHT_FORMAT : LOWER_DIAG_ROW
-			EDGE_WEIGHT_SECTION
-			%s
-			EOF
+		TYPE : TSP
+		DIMENSION: %i
+		EDGE_WEIGHT_TYPE : EXPLICIT
+		EDGE_WEIGHT_FORMAT : LOWER_DIAG_ROW
+		EDGE_WEIGHT_SECTION
+		%s
+		EOF
 		"""
 
 		return tsp_template % ( n_points, data )
@@ -36,27 +36,27 @@ class TSPResult(object):
 	@staticmethod
 	def create_xml_template(templated_data):
 		base_xml = """
-			<document>
-			<category>co</category>
-			<solver>concorde</solver>
-			<inputType>TSP</inputType>
-			<priority>long</priority>
-			<email>%s</email>
-			<dat2><![CDATA[]]></dat2>
+		<document>
+		<category>co</category>
+		<solver>concorde</solver>
+		<inputType>TSP</inputType>
+		<priority>long</priority>
+		<email>%s</email>
+		<dat2><![CDATA[]]></dat2>
 
-			<dat1><![CDATA[]]></dat1>
+		<dat1><![CDATA[]]></dat1>
 
-			<tsp><![CDATA[%s]]></tsp>
+		<tsp><![CDATA[%s]]></tsp>
 
-			<ALGTYPE><![CDATA[con]]></ALGTYPE>
+		<ALGTYPE><![CDATA[con]]></ALGTYPE>
 
-			<RDTYPE><![CDATA[fixed]]></RDTYPE>
+		<RDTYPE><![CDATA[fixed]]></RDTYPE>
 
-			<PLTYPE><![CDATA[no]]></PLTYPE>
+		<PLTYPE><![CDATA[no]]></PLTYPE>
 
-			<comment><![CDATA[]]></comment>
+		<comment><![CDATA[]]></comment>
 
-			</document>
+		</document>
 		"""
 
 		return base_xml % ( os.environ['email'], templated_data )
@@ -110,3 +110,45 @@ class TSPResult(object):
 				sys.stdout.write( msg.decode() )
 				print(msg)
 				return msg
+
+	##########################################################################
+	## Take Concorde results log and parse for city numbers and ranking 	##
+	## Put ordering into a list (tour)										##
+	##########################################################################
+	def get_tour(num_points, msg, places):
+		num_points2 = num_points
+		start_str = '%d %d' % (num_points, num_points2)
+
+		# Search the Concorde log for the start of city numbers
+		# Get the index where the numbers are first listed
+		start = msg.find(start_str)
+		legs = msg[( start + len(start_str + 1) ):]
+		indices = re.findall(r'(\d+) \d+ \d+', legs)
+		tour = map(lambda x: places['destinations'][int(x)], indices)
+		tour.append(tour[0])
+
+		print(tour)
+		return tour
+
+
+	##########################################################################
+	## Code for parameterizing results to render in html					##
+	## Split tour into subtours with a start, end, and waypoints			##
+	##########################################################################
+	def create_routes(tour):
+		routes = []
+		length = len(tour)
+		i = 1
+
+		while length >= 2:
+			rlength = min( 8, length - 2 )
+			start = tour[0]
+			end = tour[rlength + 1]
+			route = tour[ 1 : rlength + 1 ]
+			routes.append( (i, start, end, route) )
+			i += 1
+			tour = tour[rlength + 1:]
+			length = len(tour)
+
+		print(routes)
+		return routes
