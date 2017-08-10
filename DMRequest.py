@@ -14,17 +14,17 @@ class DMRequest(object):
 			'key': self.api_key,
 		}
 
-	##########################################################
-	## GET request to the Google Distance Matrix API 		##
-	##########################################################
 	def get_distances(self):
+		"""
+			Sends GET request to the Google Distance Matrix API
+		"""
 		return requests.get(self.base_url, params=self.config).json()
 
-	##########################################################
-	## Parse response for distance and duration values	 	##
-	##########################################################
 	@staticmethod
 	def get_response_data(response):
+		"""
+			Parse API response for distance and duration values
+		"""
 		data = {'distance': [], 'duration': []}
 		for r in response['rows']:
 			distances = []
@@ -36,29 +36,30 @@ class DMRequest(object):
 			data['duration'].append(durations)
 		return data
 
-	##########################################################
-	## Create a distance matrix for TSP computation		 	##
-	##########################################################
 	@staticmethod
 	def build_distance_matrix(data, places):
+		"""
+			Creates a distance matrix for TSP computation by the Concorde Solver
+			This will be used when we submit a job to the NEOS server
+		"""
 		distances = data['distance']
 
 		df = pd.DataFrame(distances, columns=places, index=places)
 		dm = pd.DataFrame(distance_matrix(df.values, df.values), index=df.index, columns=df.index)
 		return dm
 
-	############################################
-	## Create a lower triangle matrix for TSP ##
-	############################################
 	@staticmethod
 	def build_lower_triangle_matrix(data):
+		"""
+			Lower triangle matrix format in case we need to use for solving TSP
+		"""
 		lt = np.tril(data['distance'])
 		return lt
 
-	#############################################
-	## Create an upper triangle matrix for MST ##
-	#############################################
 	@staticmethod
 	def build_upper_triangle_matrix(data):
+		"""
+			Lower triangle matrix format in case we need to use for solving TSP
+		"""
 		lt = np.triu(data['distance'])
 		return lt

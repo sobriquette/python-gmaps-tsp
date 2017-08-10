@@ -1,29 +1,23 @@
-"""
-Sources:																			
-http://www.bogotobogo.com/python/python_Prims_Spanning_Tree_Data_Structure.php
-http://interactivepython.org/runestone/static/pythonds/Graphs/PrimsSpanningTreeAlgorithm.html
-"""
-
 from Vertex import Vertex
 from Graph import Graph
 
-##################################################
-##		 Prim's MST for Adjacency Matrix		##
-## 		 Runtime: 	O(V^2)						##
-## 		 Space: 	O(V^2)						##
-##################################################
-
-# Utility function to print constructed MST from primMST()
 def printMST(parent, graph, places):
+	"""
+		Prints the constructed MST along with labels of our destinations
+	"""
 	num_vertices = graph.num_vertices
 	adj_matrix = graph.adjacency_matrix
 	print("Edge \tWeight \tPlace")
 	for i in range(1, num_vertices):
-		print( parent[i], "-", i, "\t", adj_matrix[i][parent[i]], " ", places[i - 1], "to ", places[i][:7] )
+		print( parent[i], "-", i, "\t", adj_matrix[i][parent[i]], " ", \
+			   places[i - 1], "to ", places[i][:7] )
 
-# Utility function to find vertex with minimum distance value,
-# given the set of vertices not included in the MST
 def minKey(keys, mstSet, num_vertices):
+	"""
+		Finds vertex with minimum distance value 
+		given the set of vertices not included in the MST
+	"""
+
 	# Initialize min value
 	min_key = float('inf')
 
@@ -34,8 +28,15 @@ def minKey(keys, mstSet, num_vertices):
 
 	return min_index
 
-# Prim's Algorithm from GeeksforGeeks
 def primMST(graph):
+	"""
+		Builds a minimum spanning tree using Prim's Algorithm using
+		a graph represented as an adjacency matrix.
+
+		Time complexity: O(V^2)
+		Space: O(V^2)
+	"""
+
 	num_vertices = graph.num_vertices
 	adj_matrix = graph.adjacency_matrix
 
