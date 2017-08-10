@@ -5,9 +5,10 @@
 from Vertex import Vertex
 
 class Graph(object):
-	def __init__(self):
-		self.vertex_dict = {}
-		self.num_vertices = 0
+	def __init__(self, num_vertices, data):
+		self.adjacency_matrix = data # used for building a mst using prim's
+		self.vertex_dict = {} # holds each vertex and its neighbors
+		self.num_vertices = num_vertices
 
 	def __iter__(self):
 		return iter(self.vertex_dict.values())
@@ -43,4 +44,3 @@ class Graph(object):
 			new_vertex = self.add_vertex(t)
 		self.vertex_dict[f].add_neighbor(self.vertex_dict[t], cost)
 		self.vertex_dict[t].add_neighbor(self.vertex_dict[f], cost)
-

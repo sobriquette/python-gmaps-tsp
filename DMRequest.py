@@ -17,7 +17,7 @@ class DMRequest(object):
 	##########################################################
 	## GET request to the Google Distance Matrix API 		##
 	##########################################################
-	def get_matrix(self):
+	def get_distances(self):
 		return requests.get(self.base_url, params=self.config).json()
 
 	##########################################################
@@ -40,9 +40,8 @@ class DMRequest(object):
 	## Create a distance matrix for TSP computation		 	##
 	##########################################################
 	@staticmethod
-	def build_distance_matrix(data):
+	def build_distance_matrix(data, places):
 		distances = data['distance']
-		durations = data['duration']
 
 		df = pd.DataFrame(distances, columns=places, index=places)
 		dm = pd.DataFrame(distance_matrix(df.values, df.values), index=df.index, columns=df.index)
@@ -54,4 +53,12 @@ class DMRequest(object):
 	@staticmethod
 	def build_lower_triangle_matrix(data):
 		lt = np.tril(data['distance'])
+		return lt
+
+	#############################################
+	## Create an upper triangle matrix for MST ##
+	#############################################
+	@staticmethod
+	def build_upper_triangle_matrix(data):
+		lt = np.triu(data['distance'])
 		return lt

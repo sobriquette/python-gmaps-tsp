@@ -15,7 +15,7 @@ def generateWaypointsString(waypoints):
 # make GET request to google directions api
 def getDirections(base_url, config):
 	response = requests.get(base_url, params=config).json()
-	# print(json.dumps(response, sort_keys=True, indent=4))
+	print(response)
 	return response
 
 # take the api response and take only the step-by-step instructions
@@ -78,5 +78,5 @@ if __name__ == "__main__":
 	# clean the raw data
 	clean_steps_data = cleanData(raw_steps_data)
 
-	#printData(clean_steps_data)
-	#print(getTotalDrivingTimes(directions))
+	printData(clean_steps_data)
+	print(getTotalDrivingTimes(directions))
