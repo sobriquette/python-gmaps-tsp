@@ -3,6 +3,7 @@ from DMRequest import DMRequest as dmr
 from Graph import Graph
 from Vertex import Vertex
 from PrimMST import prim_mst, print_mst, dfs_mst
+from createHTML import create_optimal_route_html, get_route_from_ranking
 
 if __name__ == "__main__":
 	# List of places to include on the tour
@@ -32,15 +33,12 @@ if __name__ == "__main__":
 				 [685, 1713, 0, 609], 
 				 [901, 1596, 808, 0]]
 
-	g = Graph(len(distances), distances)
-	mst = prim_mst(g)
-	
-	# we have a minimum spanning tree!
-	print_mst(mst, g, places['origins'])
+	g = Graph(len(distances), distances) 		# convert distances to a graph
+	mst = prim_mst(g)							# find a minimum spanning tree from the graph
+	tour = dfs_mst(mst)							# perform a pre-order walk on the mst
 
-	tour = dfs_mst(mst)
-	# this is the order we should travel in
-	print(tour)
+	optimal_route = get_route_from_ranking(tour, places['origins'])
+	create_optimal_route_html(optimal_route, 1, True)
 
 	# saving upper and lower matrix configurations in case we need it later
 	# so we don't have to keep making requests to Google's API

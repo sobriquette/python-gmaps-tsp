@@ -76,7 +76,6 @@ def dfs_mst(mst):
 		g.add_edge(mst[i], i)
 
 	neighbors = [g.vertex_dict[0]]		# stack that holds all adjacent nodes of a vertex
-	print(neighbors)
 	visited = set()						# tracks which vertices we've seen
 	visited.add(0)						# start with source vertex
 
