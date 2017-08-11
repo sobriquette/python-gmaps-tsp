@@ -1,6 +1,3 @@
-#################################################################################################
-## Source: https://www.ibm.com/developerworks/community/blogs/jfp/resource/tsp_nb.html?lang=en ##
-#################################################################################################
 import os, sys, time, re
 from xmlrpc import client
 

@@ -1,7 +1,3 @@
-######################################################################################
-## Source:																			##
-## http://www.bogotobogo.com/python/python_Prims_Spanning_Tree_Data_Structure.php	##
-######################################################################################
 from Vertex import Vertex
 
 class Graph(object):
