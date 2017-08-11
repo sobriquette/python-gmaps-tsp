@@ -10,9 +10,6 @@ def get_route_from_ranking(tour, places):
 	"""
 	optimal_route = [places[stop] for stop in tour]
 
-	# for stop in tour:
-	# 	optimal_route.append(places[stop])
-
 	return optimal_route
 
 

@@ -1,8 +1,9 @@
-from TSPResult import TSPResult as tsp
-from DMRequest import DMRequest as dmr
-from Graph import Graph
-from Vertex import Vertex
-from PrimMST import prim_mst, print_mst, dfs_mst
+# from TSPResult import TSPResult as tsp
+# from DMRequest import DMRequest as dmr
+# from Graph import Graph
+# from Vertex import Vertex
+# from PrimMST import prim_mst, print_mst, dfs_mst
+from TSP import DMRequest, Graph, Vertex, PrimMST
 from createHTML import create_optimal_route_html, get_route_from_ranking
 
 if __name__ == "__main__":
@@ -33,9 +34,9 @@ if __name__ == "__main__":
 				 [685, 1713, 0, 609], 
 				 [901, 1596, 808, 0]]
 
-	g = Graph(len(distances), distances) 		# convert distances to a graph
-	mst = prim_mst(g)							# find a minimum spanning tree from the graph
-	tour = dfs_mst(mst)							# perform a pre-order walk on the mst
+	g = Graph.Graph(len(distances), distances) 		# convert distances to a graph
+	mst = PrimMST.prim_mst(g)							# find a minimum spanning tree from the graph
+	tour = PrimMST.dfs_mst(mst)							# perform a pre-order walk on the mst
 
 	optimal_route = get_route_from_ranking(tour, places['origins'])
 	create_optimal_route_html(optimal_route, 1, True)

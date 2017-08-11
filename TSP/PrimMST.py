@@ -1,5 +1,5 @@
-from Vertex import Vertex
-from Graph import Graph
+from TSP.Vertex import Vertex
+from TSP.Graph import Graph
 
 def print_mst(parent, graph, places):
 	"""

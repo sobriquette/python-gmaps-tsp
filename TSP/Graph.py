@@ -1,4 +1,4 @@
-from Vertex import Vertex
+import TSP.Vertex
 
 class Graph(object):
 	def __init__(self, num_vertices=0, data=None):
