@@ -1,8 +1,3 @@
-# from TSPResult import TSPResult as tsp
-# from DMRequest import DMRequest as dmr
-# from Graph import Graph
-# from Vertex import Vertex
-# from PrimMST import prim_mst, print_mst, dfs_mst
 from TSP import DMRequest, Graph, Vertex, PrimMST
 from createHTML import create_optimal_route_html, get_route_from_ranking
 
