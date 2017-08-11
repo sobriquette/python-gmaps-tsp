@@ -16,14 +16,14 @@ class DMRequest(object):
 
 	def get_distances(self):
 		"""
-			Sends GET request to the Google Distance Matrix API
+		Sends GET request to the Google Distance Matrix API
 		"""
 		return requests.get(self.base_url, params=self.config).json()
 
 	@staticmethod
 	def get_response_data(response):
 		"""
-			Parse API response for distance and duration values
+		Parse API response for distance and duration values
 		"""
 		data = {'distance': [], 'duration': []}
 		for r in response['rows']:
@@ -39,8 +39,8 @@ class DMRequest(object):
 	@staticmethod
 	def build_distance_matrix(data, places):
 		"""
-			Creates a distance matrix for TSP computation by the Concorde Solver
-			This will be used when we submit a job to the NEOS server
+		Creates a distance matrix for TSP computation by the Concorde Solver.
+		This will be used when we submit a job to the NEOS server.
 		"""
 		distances = data['distance']
 
@@ -51,7 +51,7 @@ class DMRequest(object):
 	@staticmethod
 	def build_lower_triangle_matrix(data):
 		"""
-			Lower triangle matrix format in case we need to use for solving TSP
+		Lower triangle matrix format in case we need to use for solving TSP
 		"""
 		lt = np.tril(data['distance'])
 		return lt
@@ -59,7 +59,7 @@ class DMRequest(object):
 	@staticmethod
 	def build_upper_triangle_matrix(data):
 		"""
-			Lower triangle matrix format in case we need to use for solving TSP
+		Lower triangle matrix format in case we need to use for solving TSP
 		"""
 		lt = np.triu(data['distance'])
 		return lt

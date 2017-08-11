@@ -11,12 +11,12 @@ class TSPResult(object):
 		self.neos = client.ServerProxy('https://%s:%d' % (self.NEOS_HOST, self.NEOS_PORT))
 		self.xml = None
 
-	##########################################
-	## TSPLIB format for NEOS/Concorde 		##
-	## Tempate for lower triangular matrix 	##
-	##########################################
 	@staticmethod
 	def create_tsp_template(n_points, data):
+		"""
+		Puts data into TSPLIB format for NEOS/Concorde solver.
+		Data must be in lower triangular matrix.
+		"""
 		tsp_template = """
 		TYPE : TSP
 		DIMENSION: %i
@@ -29,12 +29,12 @@ class TSPResult(object):
 
 		return tsp_template % ( n_points, data )
 
-	######################################
-	## TSPLIB XML for NEOS/Concorde 	##
-	## Define base XML template 		##
-	######################################
 	@staticmethod
 	def create_xml_template(templated_data):
+		"""
+		Puts templated data into TSPLIB XML format for NEOS/Concorde solver.
+		Base XML template is defined here.
+		"""
 		base_xml = """
 		<document>
 		<category>co</category>
@@ -61,19 +61,21 @@ class TSPResult(object):
 
 		return base_xml % ( os.environ['email'], templated_data )
 
-	######################################
-	## Create XML for NEOS server job 	##
-	######################################
 	@staticmethod
 	def get_xml_with_data(num_points, data):
+		"""
+		Create XML for NEOS server job using our XML template and templated data.
+		"""
 		tsp_templated_data = TSPResult.create_tsp_template( num_points, data )
 		tsp_xml = TSPResult.create_xml_template( tsp_templated_data )
 		return tsp_xml
 
-	######################
-	## Run job on NEOS 	##
-	######################
 	def run_tsp_job(self, xml):
+		"""
+		Run and submit job to NEOS server so it can return results
+		for the traveling salesman problem
+		"""
+
 		# Check that we have data to submit
 		if not xml: 
 			return "No job to submit"
@@ -111,11 +113,12 @@ class TSPResult(object):
 				print(msg)
 				return msg
 
-	##########################################################################
-	## Take Concorde results log and parse for city numbers and ranking 	##
-	## Put ordering into a list (tour)										##
-	##########################################################################
 	def get_tour(num_points, msg, places):
+		"""
+		Take Concorde results log and parse for city numbers and ranking.
+		Put ordering into a list (tour).
+		"""
+
 		num_points2 = num_points
 		start_str = '%d %d' % (num_points, num_points2)
 
@@ -131,11 +134,11 @@ class TSPResult(object):
 		return tour
 
 
-	##########################################################################
-	## Code for parameterizing results to render in html					##
-	## Split tour into subtours with a start, end, and waypoints			##
-	##########################################################################
 	def create_routes(tour):
+		"""
+		Code for parameterizing results to render in html.
+		Split tour into subtours with a start, end, and waypoints.
+		"""
 		routes = []
 		length = len(tour)
 		i = 1
