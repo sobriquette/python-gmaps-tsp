@@ -1,33 +1,13 @@
-import googlemaps
-import os.path
-import os
-import webbrowser
 
-def get_route_from_ranking(tour, places):
-	"""
-	Matches the rankings from the tour generated via MST/DFS
-	with the destinations.
-	"""
-	optimal_route = [places[stop] for stop in tour]
-
-	return optimal_route
-
-
-def create_optimal_route_html(optimal_route, distance, display=True):
-	output_file = 'output_route.html'
-	optimal_route = list(optimal_route)
-	optimal_route += [optimal_route[0]]
-
-	Page_1 = """
 	<!DOCTYPE html>
 	<html lang="en">
 	  <head>
 		<meta charset="utf-8">
 		<meta name="viewport" content="initial-scale=1.0, user-scalable=no">
-		<meta name="description" content="Display an optimal tour calculated using genetic algorithms.">
+		<meta name="description" content="Display a 2-approximate tour given set of destinations.">
 		<meta name="author" content="Melody Lin">
 		
-		<title>Suggested Route</title>
+		<title>A kinda optimal tour through required points of interest.</title>
 		<style>
 		  	html, body, #map-canvas {
 				height: 100%;
@@ -57,9 +37,9 @@ def create_optimal_route_html(optimal_route, distance, display=True):
 			var map;
 
 			function initialize() {
-				var center = new google.maps.LatLng(36.778259, -119.417931);
+				var center = new google.maps.LatLng(34.0505677, -118.2492406);
 				var mapOptions = {
-					zoom: 7,
+					zoom: 15,
 					center: center
 				};
 
@@ -93,7 +73,7 @@ def create_optimal_route_html(optimal_route, distance, display=True):
 						directionsDisplay.setDirections(response);
 					}
 			  	});
-				
+
 				routes_list.push(directionsDisplay);
 			}
 
@@ -102,8 +82,7 @@ def create_optimal_route_html(optimal_route, distance, display=True):
 				midPoints = route.slice(1, (route.length - 1));
 				calculateAndDisplayRoute(directionsService, route[0], route[route.length - 1], midPoints);
 			}
-	"""
-	Page_2 = """
+				optimal_route = ['317 S Broadway, Los Angeles, CA 90013', '221 S Grand Ave, Los Angeles, CA 90012', '111 S Grand Ave, Los Angeles, CA 90012', '845 Alameda St, Los Angeles, CA 90012', '317 S Broadway, Los Angeles, CA 90013']
 			createRoutes(optimal_route);
 			google.maps.event.addDomListener(window, 'load', initialize);
 
@@ -113,14 +92,4 @@ def create_optimal_route_html(optimal_route, distance, display=True):
 			<div id="map-canvas"></div>
 		</body>
 	</html>
-	"""
-
-	localoutput_file = output_file
-
-	with open(localoutput_file, 'w') as fs:
-		fs.write(Page_1)
-		fs.write("\t\t\toptimal_route = {0}".format(str(optimal_route)))
-		fs.write(Page_2)
-
-	if display:
-		webbrowser.open_new_tab(localoutput_file)
+	

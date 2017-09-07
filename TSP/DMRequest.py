@@ -2,38 +2,44 @@ import requests, os
 import pandas as pd
 import numpy as np
 from scipy.spatial import distance_matrix
+from itertools import combinations
 
 class DMRequest(object):
-	def __init__(self, places):
+	def __init__(self):
 		self.base_url = 'https://maps.googleapis.com/maps/api/distancematrix/json'
 		self.api_key = os.environ['DistanceMatrix_APIKEY']
-		self.places = places
-		self.config = {
-			'origins': '|'.join(self.places['origins']),
-			'destinations': '|'.join(self.places['destinations']),
-			'key': self.api_key,
-		}
 
-	def get_distances(self):
+	def get_distances(self, config):
 		"""
 		Sends GET request to the Google Distance Matrix API
 		"""
-		return requests.get(self.base_url, params=self.config).json()
+		return requests.get(self.base_url, params=config).json()
 
-	@staticmethod
-	def get_response_data(response):
+	def get_response_data(self, places):
 		"""
 		Parse API response for distance and duration values
 		"""
-		data = {'distance': [], 'duration': []}
-		for r in response['rows']:
-			distances = []
-			durations = []
-			for e in r['elements']:
-				distances.append(e['distance']['value'])
-				durations.append(e['duration']['value'])
-			data['distance'].append(distances)
-			data['duration'].append(durations)
+		data = {'waypoints_distances': {}, 'waypoints_durations': {}}
+
+		for (waypoint1, waypoint2) in combinations(places, 2):
+			try:
+				config = {
+					'origins': waypoint1,
+					'destinations': waypoint2,
+					'key': self.api_key
+				}
+
+				response = self.get_distances(config)
+
+				distance = response['rows'][0]['elements'][0]['distance']['value']
+				duration = response['rows'][0]['elements'][0]['duration']['value']
+
+				data['waypoints_distances'][frozenset([waypoint1, waypoint2])] = distance
+				data['waypoints_durations'][frozenset([waypoint1, waypoint2])] = duration
+			
+			except Exception as e:
+				print("Could not find route from %s to %s." % (waypoint1, waypoint2))
+
 		return data
 
 	@staticmethod

@@ -1,81 +1,63 @@
 import os, sys, time, re
 from xmlrpc import client
 
-class TSPResult(object):
+class ConcordeResult(object):
 	def __init__(self):
 		self.NEOS_HOST = "neos-server.org"
 		self.NEOS_PORT = 3333
 		self.neos = client.ServerProxy('https://%s:%d' % (self.NEOS_HOST, self.NEOS_PORT))
-		self.xml = None
 
-	@staticmethod
-	def create_tsp_template(n_points, data):
+	def create_tsplib_template(self, data):
 		"""
-		Puts data into TSPLIB format for NEOS/Concorde solver.
-		Data must be in lower triangular matrix.
+			Puts data into TSPLIB format for NEOS/Concorde solver.
+			Data must be in lower triangular matrix.
 		"""
 		tsp_template = """
-		TYPE : TSP
-		DIMENSION: %i
-		EDGE_WEIGHT_TYPE : EXPLICIT
-		EDGE_WEIGHT_FORMAT : LOWER_DIAG_ROW
-		EDGE_WEIGHT_SECTION
+		TYPE: TSP
+		DIMENSION: %d
+		EDGE_WEIGHT_TYPE: EXPLICIT
+		EDGE_WEIGHT_FORMAT: FULL_MATRIX
+		EDGE_WEIGHT_SECTION:
 		%s
 		EOF
 		"""
 
-		return tsp_template % ( n_points, data )
+		# Convert to integers for TSPLIB format
+		data_text = '\n'.join(' '.join(map(str, map(int, row))) for row in data)
+		return tsp_template % ( len(data), data_text )
 
-	@staticmethod
-	def create_xml_template(templated_data):
+	def create_xml_template(self, data):
 		"""
-		Puts templated data into TSPLIB XML format for NEOS/Concorde solver.
-		Base XML template is defined here.
+			Puts templated data into TSPLIB XML format for NEOS/Concorde solver.
+			Base XML template is defined here.
 		"""
 		base_xml = """
 		<document>
 		<category>co</category>
 		<solver>concorde</solver>
-		<inputType>TSP</inputType>
+		<inputMethod>TSP</inputMethod>
 		<priority>long</priority>
 		<email>%s</email>
-		<dat2><![CDATA[]]></dat2>
-
-		<dat1><![CDATA[]]></dat1>
-
 		<tsp><![CDATA[%s]]></tsp>
-
 		<ALGTYPE><![CDATA[con]]></ALGTYPE>
-
 		<RDTYPE><![CDATA[fixed]]></RDTYPE>
-
 		<PLTYPE><![CDATA[no]]></PLTYPE>
-
-		<comment><![CDATA[]]></comment>
-
 		</document>
 		"""
 
-		return base_xml % ( os.environ['email'], templated_data )
+		return base_xml % ( os.environ['email'], self.create_tsplib_template(data) )
 
-	@staticmethod
-	def get_xml_with_data(num_points, data):
+	def solve_tsp_with_neos_concorde(self, data):
 		"""
-		Create XML for NEOS server job using our XML template and templated data.
-		"""
-		tsp_templated_data = TSPResult.create_tsp_template( num_points, data )
-		tsp_xml = TSPResult.create_xml_template( tsp_templated_data )
-		return tsp_xml
-
-	def run_tsp_job(self, xml):
-		"""
-		Run and submit job to NEOS server so it can return results
-		for the traveling salesman problem
+			Run and submit job to NEOS server so it can return results
+			for the traveling salesman problem
 		"""
 
 		# Check that we have data to submit
-		if not xml: 
-			return "No job to submit"
+		if not data:
+			raise Exception("No data to submit job with")
+
+		xml = self.create_xml_template(data)
 
 		# Verify connection is successful
 		test = self.neos.ping()
@@ -110,14 +92,13 @@ class TSPResult(object):
 				print(msg)
 				return msg
 
+	@staticmethod
 	def get_tour(num_points, msg, places):
 		"""
-		Take Concorde results log and parse for city numbers and ranking.
-		Put ordering into a list (tour).
+			Take Concorde results log and parse for city numbers and ranking.
+			Put ordering into a list (tour).
 		"""
-
-		num_points2 = num_points
-		start_str = '%d %d' % (num_points, num_points2)
+		start_str = '%d %d' % (num_points, num_points)
 
 		# Search the Concorde log for the start of city numbers
 		# Get the index where the numbers are first listed
@@ -130,11 +111,11 @@ class TSPResult(object):
 		print(tour)
 		return tour
 
-
+	@staticmethod
 	def create_routes(tour):
 		"""
-		Code for parameterizing results to render in html.
-		Split tour into subtours with a start, end, and waypoints.
+			Code for parameterizing results to render in html.
+			Split tour into subtours with a start, end, and waypoints.
 		"""
 		routes = []
 		length = len(tour)

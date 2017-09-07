@@ -1,7 +1,7 @@
 import TSP.DMRequest
 import TSP.Graph
 import TSP.PrimMST
-import TSP.TSPResult
+import TSP.ConcordeResult
 import TSP.Vertex
 
-__all__ = [DMRequest, TSPResult, Graph, PrimMST, Vertex]
+__all__ = [DMRequest, ConcordeResult, Graph, PrimMST, Vertex]

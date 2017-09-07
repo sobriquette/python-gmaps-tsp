@@ -15,4 +15,5 @@ Sources:
 - Integrating with Concorde TSP Solver by Jean-Francois Puget: https://www.ibm.com/developerworks/community/blogs/jfp/resource/tsp_nb.html?lang=en
 - Prim's Minimum Spanning Tree: http://www.bogotobogo.com/python/python_Prims_Spanning_Tree_Data_Structure.php
 - Prim's Minimum Spanning Tree (2): www.geeksforgeeks.org/greedy-algorithms-set-5-prims-minimum-spanning-tree-mst-2/
-- Optimal Tour of the Us by Randy Olson: http://www.randalolson.com/2015/03/08/computing-the-optimal-road-trip-across-the-u-s/
+- Optimal Tour of the US by Randy Olson: https://github.com/rhiever/Data-Analysis-and-Machine-Learning-Projects/blob/master/optimal-road-trip/
+- Applying a Genetic Algorithm to the Traveling Salesman Problem: http://www.theprojectspot.com/tutorial-post/applying-a-genetic-algorithm-to-the-travelling-salesman-problem/5
