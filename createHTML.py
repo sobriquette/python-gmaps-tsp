@@ -13,8 +13,7 @@ def get_route_from_ranking(tour, places):
 	return optimal_route
 
 
-def create_optimal_route_html(optimal_route, distance, display=True):
-	output_file = 'output_route.html'
+def create_optimal_route_html(optimal_route, distance, filename, display=True):
 	optimal_route = list(optimal_route)
 	optimal_route += [optimal_route[0]]
 
@@ -56,7 +55,7 @@ def create_optimal_route_html(optimal_route, distance, display=True):
 			var directionsService = new google.maps.DirectionsService();
 			var map;
 
-			function initialize() {
+			var initialize = function initialize() {
 				var center = new google.maps.LatLng(36.778259, -119.417931);
 				var mapOptions = {
 					zoom: 7,
@@ -67,9 +66,12 @@ def create_optimal_route_html(optimal_route, distance, display=True):
 				for (i = 0; i < routes_list.length; i++){
 					routes_list[i].setMap(map)
 				}
+
+				// display the suggested route
+				document.getElementById('optimal-route').appendChild(createDOMList(optimal_route));
 			}
 
-			function calculateAndDisplayRoute(directionsService, start, end, routes) {
+			var calculateAndDisplayRoute = function calculateAndDisplayRoute(directionsService, start, end, routes) {
 			  
 				var directionsDisplay = new google.maps.DirectionsRenderer(directionsDisplayOptions);
 
@@ -97,29 +99,46 @@ def create_optimal_route_html(optimal_route, distance, display=True):
 				routes_list.push(directionsDisplay);
 			}
 
-			function createRoutes(route) {
+			var createRoutes = function createRoutes(route) {
 				
 				midPoints = route.slice(1, (route.length - 1));
 				calculateAndDisplayRoute(directionsService, route[0], route[route.length - 1], midPoints);
+			}
+
+			var createDOMList = function createDOMList(array) {
+
+				var list = document.createElement('ol');
+				for (var i = 0; i < array.length; i++) {
+					var item = document.createElement('li');
+
+					// set contents of list item
+					item.appendChild(document.createTextNode(array[i]));
+
+					// add it to the list
+					list.appendChild(item);
+				}
+
+				// return constructed list
+				return list;
 			}
 	"""
 	Page_2 = """
 			createRoutes(optimal_route);
 			google.maps.event.addDomListener(window, 'load', initialize);
-
 		</script>
 		</head>
 		<body>
+			<div id="optimal-route"></div>
 			<div id="map-canvas"></div>
 		</body>
 	</html>
 	"""
 
-	localoutput_file = output_file
+	localoutput_file = filename + '.html'
 
 	with open(localoutput_file, 'w') as fs:
 		fs.write(Page_1)
-		fs.write("\t\t\toptimal_route = {0}".format(str(optimal_route)))
+		fs.write("\t\t\toptimal_route = {0};".format(str(optimal_route)))
 		fs.write(Page_2)
 
 	if display:

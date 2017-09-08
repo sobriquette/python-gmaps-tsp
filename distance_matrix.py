@@ -92,15 +92,15 @@ if __name__ == "__main__":
 	## Then we construct a minimum spanning tree.								##
 	## Finally, we do a preorder walk of the MST to get the tour.				##
 	##############################################################################
-	# g = Graph.Graph(len(distances), distances)
-	# mst = PrimMST.prim_mst(g)
-	# tour = PrimMST.dfs_mst(mst)
-	# optimal_route = get_route_from_ranking(tour, places)
-
+	g = Graph.Graph(len(distances), distances)
+	mst = PrimMST.prim_mst(g)
+	tour = PrimMST.dfs_mst(mst)
+	optimal_route = get_route_from_ranking(tour, places)
+	create_optimal_route_html(optimal_route, 1, "results-MST", True)
+	
 	##############################################################################
 	## Solution 3: apply a genetic algorithm written by Randy S. Olson			##
 	## Source to original GitHub code provided in README						##
 	##############################################################################
 	optimal_route = run_genetic_algorithm(places, waypoints_distances, generations, population_size)
-
-	create_optimal_route_html(optimal_route, 1, True)
+	create_optimal_route_html(optimal_route, 1, "results-GA", True)

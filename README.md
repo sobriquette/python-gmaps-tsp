@@ -4,7 +4,7 @@ Computing optimal travel routes using the Google Distance Matrix API and various
 Approaches so far:
 1) Using the best known TSP solver, Concorde, to produce results.
 2) Constructing a minimum spanning tree and using a depth-first traversal on the tree to find a Hamiltonian path.
-3) Genetic algorithms (?)
+3) Genetic algorithms
 
 Goals for this project:
 1) Learn how to make requests to Google APIs
