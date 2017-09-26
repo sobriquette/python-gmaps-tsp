@@ -1,6 +1,6 @@
 # Local folders and files
 maps_python/
-results/
+api_responses/
 test/
 tmp/
 .DS_Store
